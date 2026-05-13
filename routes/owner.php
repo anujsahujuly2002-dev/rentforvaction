@@ -36,6 +36,7 @@ Route::prefix('owner')->name('owner.')->group(function(){
             Route::post('add-more-rental-rates','addMoreRentalRates');
             Route::get('/property-gallery-image','propertyGalleryImage')->name('gallery.image');
             Route::post('/gallery-image-store','galleryImageStore');
+            Route::post('/delete-gallery-image','deleteGalleryImage');
             Route::get('/rental-policies','rentalPolicies')->name('rental.policies');
             Route::post('/rental-polices-store','rentalPoliciesStore');
             Route::get('/calender','calender')->name('calender');

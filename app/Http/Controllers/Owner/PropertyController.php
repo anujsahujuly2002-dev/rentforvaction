@@ -3,31 +3,32 @@
 namespace App\Http\Controllers\Owner;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Helper\Helper;
+use App\Http\Requests\Owner\PrepertyReviews;
+use App\Http\Requests\Owner\PropertyInformationRequest;
+use App\Http\Requests\Owner\RentalRateRequest;
+use App\Models\Aminities;
+use App\Models\City;
+use App\Models\Country;
+use App\Models\Currency;
+use App\Models\Property;
+use App\Models\PropertyAmenites;
+use App\Models\PropertyBooking;
+use App\Models\PropertyGalleryImage;
+use App\Models\PropertyRate;
+use App\Models\PropertyReviews;
 use App\Models\PropertySuitablity;
 use App\Models\PropertyTypes;
-use App\Models\Country;
-use App\Http\Requests\Owner\PropertyInformationRequest;
-use App\Http\Requests\Owner\PrepertyReviews;
-use App\Models\Aminities;
-use App\Models\Property;
-use App\Models\SubAmenities;
-use App\Models\PropertyAmenites;
-use App\Models\ThirdLevelAmenities;
-use App\Http\Helper\Helper;
-use App\Models\PropertyRate;
-use DataTables;
-use App\Models\Currency;
-use App\Http\Requests\Owner\RentalRateRequest;
-use App\Models\PropertyGalleryImage;
-use App\Models\PropertyBooking;
-use App\Models\PropertyReviews;
-use App\Models\State;
 use App\Models\Region;
-use App\Models\City;
+use App\Models\State;
+use App\Models\SubAmenities;
 use App\Models\SubCity;
+use App\Models\ThirdLevelAmenities;
 use Auth;
 use Carbon\Carbon;
+use DataTables;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 
 class PropertyController extends Controller
@@ -311,7 +312,7 @@ class PropertyController extends Controller
                     $ext = "webp";
                     $convertImage = \Image::make($image->getRealPath())->resize(1000, 720)->encode($ext,100);
                     $originalImageName = uniqid().'.'.$ext;
-                    \Storage::put('public/upload/property_image/gallery_image/'.$request->input("property_id").'/'.$originalImageName, $convertImage);
+                    Storage::put('public/upload/property_image/gallery_image/'.$request->input("property_id").'/'.$originalImageName, $convertImage);
                     $propertyGalleryImage = PropertyGalleryImage::create([
                         "property_id"=>$request->input("property_id"),
                         "image_name"=>$originalImageName
@@ -324,6 +325,26 @@ class PropertyController extends Controller
             "msg"=>$request->input('type') !='edit'?"Gallery Photos Added Successfully, Please Wait redirecting....":"Gallery Photos Updated Successfully, Please Wait redirecting....",
             "url"=>route('owner.property.rental.policies',$request->input('type') !='edit'?['id'=>$request->input('property_id')]:['id'=>$request->input('property_id'),'type'=>'edit'])
         ]);
+    }
+
+    public function deleteGalleryImage(Request $request) {
+        $galleryImage = PropertyGalleryImage::findOrFail($request->input('id'));
+        $path = 'public/upload/property_image/gallery_image/'.$galleryImage->property_id.'/'.$galleryImage->image_name;
+        if(Storage::exists($path)):
+            Storage::delete($path);
+        endif;
+        $deleted = $galleryImage->delete();
+        if($deleted):
+            return response()->json([
+                'status'=>200,
+                'msg'=>"Gallery Image Deleted Successfully."
+            ]);
+        else:
+            return response()->json([
+                'status'=>500,
+                'msg'=>"Gallery Image Not Deleted, Please Try Again."
+            ]);
+        endif;
     }
 
     public function rentalPolicies(Request $request) {

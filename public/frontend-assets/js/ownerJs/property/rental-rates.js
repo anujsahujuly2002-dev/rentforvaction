@@ -48,15 +48,15 @@ $(function () {
                     name: "nightly_rate",
                     orderable: false,
                 },
-                { data: "weekly_rate", name: "weekly_rate", orderable: false },
                 {
                     data: "weekend_rate",
                     name: "weekend_rate",
                     orderable: false,
                 },
+                { data: "weekly_rate", name: "weekly_rate", orderable: false },
                 {
                     data: "monthly_rate",
-                    name: "weekend_rate",
+                    name: "monthly_rate",
                     orderable: false,
                 },
                 {

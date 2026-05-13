@@ -1121,13 +1121,12 @@
                                 </div>
                                 <div class="card-body d-flex flex-wrap justify-content-start" id="container">
                                     @if (!empty($property))
-                                        {{-- @dd($property->galleryImage) --}}
                                         @foreach ($property->galleryImage as $galleryImage)
-                                            <div class="image_container d-flex justify-content-center position-relative">
+                                            <div class="image_container d-flex justify-content-center position-relative" id="gallery_image_{{ $galleryImage->id }}">
                                                 <img src="{{ env('IMAGE_URL') . '/upload/property_image/gallery_image/' . $property->id . '/' . $galleryImage->image_name }}"
                                                     alt="Image" srcset="">
                                                 <span class="position-absolute"
-                                                    onclick=delete_image(${images.indexOf(i)})>&times;</span>
+                                                    onclick="deleteGalleryImage({{ $galleryImage->id }})">&times;</span>
                                             </div>
                                         @endforeach
                                     @endif

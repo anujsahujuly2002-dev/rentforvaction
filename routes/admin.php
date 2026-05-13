@@ -122,6 +122,7 @@ Route::prefix('admin')->name('admin.')->group(function() {
             Route::post('/rates-store','ratesStore');
             Route::post('/rental-rates-store','rentalRatesStore');
             Route::post('/gallery-image-store','galleryImageStore');
+            Route::post('/delete-gallery-image','deleteGalleryImage');
             Route::post('/rental-polices-store','rentalPolicesStore');
             Route::post('/calender-synchronization','calenderSyncronization');
             Route::get('/get-property-bookings','getPropertyBookings');

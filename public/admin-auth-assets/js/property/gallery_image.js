@@ -33,6 +33,48 @@ function delete_image(e){
     document.getElementById('container').innerHTML= image_show();
 }
 
+function deleteGalleryImage(id) {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            showLoader();
+            $.ajax({
+                url: site_url + "/admin/property/delete-gallery-image",
+                type: "POST",
+                data: { id: id },
+                dataType: "json",
+                success: (res) => {
+                    hideLoader();
+                    if (res.status === 200) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Deleted!',
+                            text: res.msg,
+                            timer: 1500,
+                            showConfirmButton: false
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    } else {
+                        Swal.fire('Error!', res.msg, 'error');
+                    }
+                },
+                error: (xhr) => {
+                    hideLoader();
+                    Swal.fire('Error!', (xhr.responseJSON && xhr.responseJSON.message) || 'Something went wrong.', 'error');
+                }
+            });
+        }
+    });
+}
+
 function check_dublicate(name){
     var dublicate_image = true;
     for(i=0;i<images.length;i++) {

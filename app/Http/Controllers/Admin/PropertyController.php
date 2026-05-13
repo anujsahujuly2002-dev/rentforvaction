@@ -2,38 +2,39 @@
 
 namespace App\Http\Controllers\Admin;
 
-use Hash;
-use App\Models\City;
-use App\Models\User;
-use App\Models\State;
-use App\Models\Region;
-use App\Models\Country;
-use App\Models\SubCity;
-use App\Models\Currency;
-use App\Models\Property;
-use App\Models\Aminities;
-use App\Http\Helper\Helper;
-use App\Models\PropertyRate;
-use App\Models\SubAmenities;
-use Illuminate\Http\Request;
-use App\Models\PropertyTypes;
-use App\Models\PropertyBooking;
-use App\Models\PropertyReviews;
-use App\Models\UserInformation;
-use App\Models\FeaturedProperty;
-use App\Models\Recommendation;
-use App\Models\PropertyAmenites;
-use App\Models\PropertySuitablity;
-use App\Models\ThirdLevelAmenities;
 use App\Http\Controllers\Controller;
-use App\Models\PropertyGalleryImage;
-use Illuminate\Support\Facades\Auth;
-use Yajra\DataTables\Facades\DataTables;
+use App\Http\Helper\Helper;
+use App\Http\Requests\Property\PropertyInformationRequest;
+use App\Http\Requests\Property\PropertyReviewsRequest;
 use App\Http\Requests\Property\RatesRequest;
 use App\Http\Requests\Property\RentalRatesRequest;
-use App\Http\Requests\Property\PropertyReviewsRequest;
+use App\Models\Aminities;
+use App\Models\City;
+use App\Models\Country;
+use App\Models\Currency;
+use App\Models\FeaturedProperty;
+use App\Models\Property;
+use App\Models\PropertyAmenites;
+use App\Models\PropertyBooking;
+use App\Models\PropertyGalleryImage;
+use App\Models\PropertyRate;
+use App\Models\PropertyReviews;
+use App\Models\PropertySuitablity;
+use App\Models\PropertyTypes;
+use App\Models\Recommendation;
+use App\Models\Region;
+use App\Models\State;
+use App\Models\SubAmenities;
+use App\Models\SubCity;
+use App\Models\ThirdLevelAmenities;
+use App\Models\User;
+use App\Models\UserInformation;
+use Hash;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Exceptions\UnauthorizedException;
-use App\Http\Requests\Property\PropertyInformationRequest;
+use Yajra\DataTables\Facades\DataTables;
 
 class PropertyController extends Controller
 {
@@ -410,6 +411,26 @@ class PropertyController extends Controller
         return response()->json([
             'status'=>'1'
         ]);
+    }
+
+    public function deleteGalleryImage(Request $request){
+        $galleryImage = PropertyGalleryImage::findOrFail($request->input('id'));
+        $path = 'public/upload/property_image/gallery_image/'.$galleryImage->property_id.'/'.$galleryImage->image_name;
+        if(Storage::exists($path)):
+            Storage::delete($path);
+        endif;
+        $deleted = $galleryImage->delete();
+        if($deleted):
+            return response()->json([
+                'status'=>200,
+                'msg'=>"Gallery Image Deleted Successfully."
+            ]);
+        else:
+            return response()->json([
+                'status'=>500,
+                'msg'=>"Gallery Image Not Deleted, Please Try Again."
+            ]);
+        endif;
     }
 
     public function rentalPolicesStore(Request $request){
