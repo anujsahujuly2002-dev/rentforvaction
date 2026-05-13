@@ -158,16 +158,16 @@
                                     <input value="{{ Auth()->user()->userInformation?->phone??"" }}" type="text" placeholder="(123) 123-456" name="phone">
                                     <label>Alternate Phone Number *</label>
                                     <input value="{{ Auth()->user()->userInformation?->alternate_phone??"" }}" type="text" placeholder="(123) 123-456" name="alternate_phone">
-    
+
                                     <label>Email Address *</label>
                                     <input value="{{ Auth()->user()->email }}" type="text" name="email_address">
                                     <label>Alternate Email Address *</label>
                                     <input value="{{ Auth()->user()->userInformation?->secondary_email??"" }}" type="text" name="alternate_email_address">
-    
+
                                     <label>Your Bio *</label>
                                     <textarea name="notes" id="notes" cols="30" rows="10" name="about_you">{{ Auth()->user()->userInformation?->about_you??"" }}</textarea>
                                 </div>
-                                <button type="submit" class="button">Save Changes</button>                            
+                                <button type="submit" class="button">Save Changes</button>
                             </form>
                         </div>
                         <div class="tab-pane fade" id="photo" role="tabpanel">
@@ -181,7 +181,7 @@
                                                     $profilePic = Auth()->user()->userInformation?->profile_pic ?? null;
                                                 @endphp
                                                 @if ($profilePic)
-                                                    <img id="profilePhotoPreview" src="{{ url('storage/upload/profile_image/'.$profilePic) }}" alt="Profile photo">
+                                                    <img id="profilePhotoPreview" src="{{ env('IMAGE_URL') . '/upload/profile_image/'.$profilePic }}" alt="Profile photo">
                                                 @else
                                                     <img id="profilePhotoPreview" src="" alt="Profile photo" style="display:none;">
                                                     <div class="profile-photo-placeholder" id="profilePhotoPlaceholder"></div>
@@ -216,20 +216,20 @@
                                     <div class="my-profile">
                                         <label class="margin-top-0">Street Address</label>
                                         <input type="text" name="street_address" value="{{ Auth()->user()->userInformation?->address }}">
-    
+
                                         <label>City</label>
                                         <input type="text" name="city" value="{{ Auth()->user()->userInformation?->city }}">
-    
+
                                         <label>State</label>
                                         <input type="text" name="state" value="{{ Auth()->user()->userInformation?->state }}">
-    
+
                                         <label>Country</label>
                                         <input type="text" name="country" value="{{ Auth()->user()->userInformation?->country }}">
-    
+
                                         <label>Zip Code</label>
                                         <input type="text" name="zip_code" value="{{ Auth()->user()->userInformation?->zipcode }}">
                                         <button class="button" type="submit">Save</button>
-                                    </div>                            
+                                    </div>
                                 </form>
                             </div>
                             <div class="tab-pane fade" id="billing" role="tabpanel">
@@ -240,7 +240,7 @@
                                     <input type="text">
 
                                     <button class="button">Save</button>
-                                </div>                            
+                                </div>
                             </div>
                             <div class="tab-pane fade" id="password" role="tabpanel">
                                 <div class="small-title">Changes Password</div>
@@ -257,10 +257,10 @@
                                         <input type="text" name="confirm_new_password">
                                         <span class="confirm_new_password text-danger"></span>
                                         <button class="button" type="submit">Update</button>
-                                    </div>                        
+                                    </div>
                                 </form>
                             </div>
-                        </div>                        
+                        </div>
                     </div>
                 </div>
             </div>

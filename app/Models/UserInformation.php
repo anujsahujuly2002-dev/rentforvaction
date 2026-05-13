@@ -18,8 +18,11 @@ class UserInformation extends Model
         'address',
         'city',
         'state',
+        'country',
+        'zipcode',
         'year_purchased',
         'about_you',
         'term_conditions',
+        'profile_pic',
     ];
 }
