@@ -59,8 +59,17 @@ class HomeController extends Controller
     }
 
     public function profilePhoto(Request $request) {
-        $profile_iamge = time().uniqid().".".$request->file('profile_image')->getClientOriginalExtension();
+        if(!$request->hasFile('profile_image')):
+            return response()->json([
+                'status'=>422,
+                'msg'=>"Please select a photo before uploading."
+            ]);
+        endif;
         $destinationPath = storage_path('app/public/upload/profile_image/');
+        if(!file_exists($destinationPath)):
+            mkdir($destinationPath, 0775, true);
+        endif;
+        $profile_iamge = time().uniqid().".".$request->file('profile_image')->getClientOriginalExtension();
         $request->file('profile_image')->move($destinationPath,$profile_iamge);
         $userProfile = UserInformation::where('user_id',Auth()->user()->id)->update([
             'profile_pic'=>$profile_iamge
@@ -102,11 +111,11 @@ class HomeController extends Controller
     public function changePassword(ChangePasswordRequest $request) {
         $auth = Auth::user();
         // The passwords matches
-        if (!Hash::check($request->input('old_password'), $auth->password)) 
+        if (!Hash::check($request->input('old_password'), $auth->password))
         {
             return response()->json([
                 'status'=>500,
-                'msg', "Current Password is Password Does Not matched"
+                'msg'=>"Old Password does not match."
             ]);
         }
 
