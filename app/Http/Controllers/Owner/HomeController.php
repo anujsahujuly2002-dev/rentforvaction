@@ -29,12 +29,15 @@ class HomeController extends Controller
             'email'=>$request->input('email_address'),
         ]);
         if($user):
-            UserInformation::where('user_id',Auth()->user()->id)->update([
-                'secondary_email'=>$request->input('alternate_email_address'),
-                'phone'=>$request->input('phone'),
-                'alternate_phone'=>$request->input('alternate_phone'),
-                'about_you'=>$request->input('notes')
-            ]);
+            UserInformation::updateOrCreate(
+                ['user_id'=>Auth()->user()->id],
+                [
+                    'secondary_email'=>$request->input('alternate_email_address'),
+                    'phone'=>$request->input('phone'),
+                    'alternate_phone'=>$request->input('alternate_phone'),
+                    'about_you'=>$request->input('notes')
+                ]
+            );
 
             return response()->json([
                 'status'=>200,
@@ -71,9 +74,10 @@ class HomeController extends Controller
         endif;
         $profile_iamge = time().uniqid().".".$request->file('profile_image')->getClientOriginalExtension();
         $request->file('profile_image')->move($destinationPath,$profile_iamge);
-        $userProfile = UserInformation::where('user_id',Auth()->user()->id)->update([
-            'profile_pic'=>$profile_iamge
-        ]);
+        $userProfile = UserInformation::updateOrCreate(
+            ['user_id'=>Auth()->user()->id],
+            ['profile_pic'=>$profile_iamge]
+        );
         if($userProfile):
             return response()->json([
                 'status'=>200,
@@ -88,13 +92,16 @@ class HomeController extends Controller
     }
 
     public function ownerAddress(Request $request) {
-        $ownerAddress = UserInformation::where('user_id',Auth()->user()->id)->update([
-            'address'=>$request->input('street_address'),
-            'city'=>$request->input('city'),
-            'state'=>$request->input('state'),
-            'country'=>$request->input('country'),
-            'zipcode'=>$request->input('zip_code'),
-        ]);
+        $ownerAddress = UserInformation::updateOrCreate(
+            ['user_id'=>Auth()->user()->id],
+            [
+                'address'=>$request->input('street_address'),
+                'city'=>$request->input('city'),
+                'state'=>$request->input('state'),
+                'country'=>$request->input('country'),
+                'zipcode'=>$request->input('zip_code'),
+            ]
+        );
         if($ownerAddress):
             return response()->json([
                 'status'=>200,
