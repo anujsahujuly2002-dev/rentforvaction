@@ -1,3 +1,69 @@
+<style>
+    .area-searching .date-fields-row {
+        display: flex;
+        gap: 10px;
+    }
+    .area-searching .date-field {
+        position: relative;
+        flex: 1;
+        display: flex;
+        align-items: center;
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+        min-height: 46px;
+        transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    .area-searching .date-field:focus-within {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+    }
+    .area-searching .date-field i {
+        position: absolute;
+        left: 12px;
+        color: #6b7280;
+        font-size: 15px;
+        pointer-events: none;
+    }
+    .area-searching .date-field input.date-input {
+        width: 100%;
+        border: 0;
+        background: transparent;
+        padding: 8px 30px 8px 36px;
+        font-size: 14px;
+        color: #111827;
+        cursor: pointer;
+        box-shadow: none;
+        border-radius: 8px;
+    }
+    .area-searching .date-field input.date-input:focus {
+        outline: none;
+        box-shadow: none;
+    }
+    .area-searching .date-field .date-clear-btn {
+        position: absolute;
+        right: 6px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: transparent;
+        border: 0;
+        font-size: 18px;
+        line-height: 1;
+        color: #9ca3af;
+        cursor: pointer;
+        padding: 4px 6px;
+        display: none;
+        transition: color 0.15s ease;
+    }
+    .area-searching .date-field .date-clear-btn:hover { color: #ef4444; }
+    .area-searching .date-field.has-value .date-clear-btn { display: block; }
+    /* Litepicker tweaks */
+    .litepicker .container__months {
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        border-radius: 10px;
+    }
+</style>
 <section class="area-searching">
     <div class="container-fluid">
         <div class="row">
@@ -23,19 +89,21 @@
                             </div>
                         </div>
                         <div class="col-md-4 mt-2">
-                            <div class="row">
-                                {{-- <div class="col-md-6">
-                                    <div class="form-group form-icon">
-                                        <div class='input-group input-group1 date' id='datetimepicker2'>
-                                            <input type='text' class="form-control" value="Check Out" />
-                                            <span class="tooltip">Check Out <sup>*</sup></span>
-                                            <i class="flaticon-calendar"></i>
-                                            <!-- <span class="input-group-addon">
-                                        <i class="fa fa-calendar" aria-hidden="true"></i>
-                                    </span> -->
-                                        </div>
-                                    </div>
-                                </div> --}}
+                            <div class="date-fields-row">
+                                <div class="date-field {{ request('checkin') ? 'has-value' : '' }}" id="checkInField">
+                                    <i class="bi bi-calendar-event"></i>
+                                    <input type="text" id="checkIn" name="checkin" class="date-input"
+                                           placeholder="Check-in" autocomplete="off" readonly
+                                           value="{{ request('checkin') }}">
+                                    <button type="button" class="date-clear-btn" data-clear="checkIn" title="Clear">&times;</button>
+                                </div>
+                                <div class="date-field {{ request('checkout') ? 'has-value' : '' }}" id="checkOutField">
+                                    <i class="bi bi-calendar-check"></i>
+                                    <input type="text" id="checkOut" name="checkout" class="date-input"
+                                           placeholder="Check-out" autocomplete="off" readonly
+                                           value="{{ request('checkout') }}">
+                                    <button type="button" class="date-clear-btn" data-clear="checkOut" title="Clear">&times;</button>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-5 mt-2">

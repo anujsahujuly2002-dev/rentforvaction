@@ -163,66 +163,111 @@
   ]
 });
 // end
-// datepicker
-  const checkInField = document.getElementById('checkIn');
-    const checkOutField = document.getElementById('checkOut');
+// datepicker — two independent single-date Litepickers for #checkIn and #checkOut.
+// Picking a check-in date pushes the check-out picker's minDate forward by one day,
+// and clears any stale check-out value that's now before the new check-in.
+// Guarded so pages without these inputs don't throw.
+(function initSingleDatepickers() {
+    const checkInInput = document.getElementById('checkIn');
+    const checkOutInput = document.getElementById('checkOut');
+    if (!checkInInput || !checkOutInput || typeof Litepicker === 'undefined') {
+        return;
+    }
 
-    const picker = new Litepicker({
-      element: checkInField,
-      elementEnd: checkOutField,
-      singleMode: false,
-      numberOfMonths: window.innerWidth < 768 ? 1 : 2,
-      numberOfColumns: window.innerWidth < 768 ? 1 : 2,
-      format: 'YYYY-MM-DD',
-      autoApply: true,
-      resetButton: true,
-      allowRepick: true,
-      minDays: 1,
-      tooltipText: {
-        one: 'night',
-        other: 'nights',
-      },
-      tooltipNumber: (totalDays) => totalDays - 1,
-      setup: (picker) => {
-        picker.on('preselect', (start, end) => {
-          if (start && !end) {
-            checkInField.value = start.format('YYYY-MM-DD');
-            checkOutField.value = '';
-          }
-        });
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-        picker.on('selected', (start, end) => {
-          checkInField.value = start.format('YYYY-MM-DD');
-          checkOutField.value = end.format('YYYY-MM-DD');
-        });
+    function parseYmd(v) {
+        if (!v) return null;
+        const parts = v.split('-');
+        if (parts.length !== 3) return null;
+        const d = new Date(+parts[0], +parts[1] - 1, +parts[2]);
+        return isNaN(d.getTime()) ? null : d;
+    }
 
-        picker.on('render', () => {
-          const calendar = document.querySelector('.litepicker');
-          if (calendar && !calendar.querySelector('.litepicker-close-btn')) {
-            const closeBtn = document.createElement('div');
-            closeBtn.className = 'litepicker-close-btn';
-            closeBtn.innerText = 'Close';
-            closeBtn.onclick = () => picker.hide();
-            calendar.appendChild(closeBtn);
-          }
-        });
-      }
+    function nextDay(d) {
+        const n = new Date(d);
+        n.setDate(n.getDate() + 1);
+        return n;
+    }
+
+    function markHasValue(fieldEl, hasVal) {
+        if (!fieldEl) return;
+        fieldEl.classList.toggle('has-value', !!hasVal);
+    }
+
+    const checkInFieldEl = document.getElementById('checkInField');
+    const checkOutFieldEl = document.getElementById('checkOutField');
+
+    markHasValue(checkInFieldEl, checkInInput.value);
+    markHasValue(checkOutFieldEl, checkOutInput.value);
+
+    // Check-in picker
+    const checkInPicker = new Litepicker({
+        element: checkInInput,
+        singleMode: true,
+        numberOfMonths: 1,
+        numberOfColumns: 1,
+        format: 'YYYY-MM-DD',
+        minDate: today,
+        autoApply: true,
+        setup: (picker) => {
+            picker.on('selected', (date) => {
+                const ymd = date.format('YYYY-MM-DD');
+                checkInInput.value = ymd;
+                markHasValue(checkInFieldEl, true);
+
+                // Push check-out minDate to the day after check-in, and clear stale value.
+                const minOut = nextDay(date.dateInstance);
+                checkOutPicker.setOptions({ minDate: minOut });
+                const currentOut = parseYmd(checkOutInput.value);
+                if (currentOut && currentOut < minOut) {
+                    checkOutInput.value = '';
+                    checkOutPicker.clearSelection();
+                    markHasValue(checkOutFieldEl, false);
+                }
+            });
+        }
     });
 
-    // Clear button functionality
-    document.getElementById('clearBtn').addEventListener('click', () => {
-      picker.clearSelection();
-      checkInField.value = '';
-      checkOutField.value = '';
+    // Check-out picker — initial minDate is the day after check-in if set, else today+1.
+    const initialIn = parseYmd(checkInInput.value);
+    const initialOutMin = initialIn ? nextDay(initialIn) : nextDay(today);
+
+    const checkOutPicker = new Litepicker({
+        element: checkOutInput,
+        singleMode: true,
+        numberOfMonths: 1,
+        numberOfColumns: 1,
+        format: 'YYYY-MM-DD',
+        minDate: initialOutMin,
+        autoApply: true,
+        setup: (picker) => {
+            picker.on('selected', (date) => {
+                checkOutInput.value = date.format('YYYY-MM-DD');
+                markHasValue(checkOutFieldEl, true);
+            });
+        }
     });
 
-    // Auto reconfigure on resize
-    window.addEventListener('resize', () => {
-      picker.setOptions({
-        numberOfMonths: window.innerWidth < 768 ? 1 : 2,
-        numberOfColumns: window.innerWidth < 768 ? 1 : 2
-      });
+    // Per-field clear buttons (× icon inside each input)
+    document.querySelectorAll('.date-clear-btn[data-clear]').forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const target = btn.getAttribute('data-clear');
+            if (target === 'checkIn') {
+                checkInPicker.clearSelection();
+                checkInInput.value = '';
+                markHasValue(checkInFieldEl, false);
+                // Reset check-out's minDate back to today+1 since check-in is gone.
+                checkOutPicker.setOptions({ minDate: nextDay(today) });
+            } else if (target === 'checkOut') {
+                checkOutPicker.clearSelection();
+                checkOutInput.value = '';
+                markHasValue(checkOutFieldEl, false);
+            }
+        });
     });
-
+})();
 // end
 

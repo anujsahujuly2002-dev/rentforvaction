@@ -123,13 +123,15 @@
                             </div>
                             <div class="col-sm-2 col-md-2">
                                 <div class="check-position mb-3">
-                                    <select name="" id="" class="form-control form-control2"
-                                        aria-describedby="basic-addon44">
+                                    <select name="" id="" class="form-control form-control2" aria-describedby="basic-addon44">
                                         <option value="">Select Guest</option>
-                                        <option value="">1</option>
-                                        <option value="">2</option>
-                                        <option value="">3</option>
-                                        <option value="">4</option>
+                                        @for($i = 1; $i <= 10; $i++)
+                                            @if($i == 10)
+                                                <option value="{{ $i }}" >{{ $i }}+</option>
+                                            @else
+                                                <option value="{{ $i }}">{{ $i }}</option>
+                                            @endif
+                                        @endfor
                                     </select>
                                     <span><i class="bi bi-people-fill"></i></span>
                                 </div>
