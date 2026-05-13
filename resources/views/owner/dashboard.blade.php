@@ -29,7 +29,7 @@
                                         <li>{{ $property->property_name }}</li>
                                         <li>{{ $property->country->name }}, {{ $property->state->name }}, {{ $property?->city?->name }}</li>
                                         {{-- <li>Subscription Level : <strong>Platinum</strong></li> --}}
-                                        <li>Listing Expires On : <strong>{{ $property->subscription_date !=null?date('F d Y',strtotime($property->subscription_date)):"NA" }} <a href="javascript:void(0)">Renew Now</a></strong></li>
+                                        {{-- <li>Listing Expires On : <strong>{{ $property->subscription_date !=null?date('F d Y',strtotime($property->subscription_date)):"NA" }} <a href="javascript:void(0)">Renew Now</a></strong></li> --}}
                                     </ul>
                                 </div>
                             </div>
@@ -41,9 +41,9 @@
                     <div class="listing-point">
                         <ul>
                             <li><a href="{{ route("owner.property.create",['id'=>$property->id,'type'=>"edit"]) }}">Edit Listing</a></li>
-                            <li><a href="javascript:void(0)">Update Calendar</a></li>
-                            <li><a href="javascript:void(0)">Manage Photos</a></li>
-                            <li><a href="javascript:void(0)">Preview Listing</a></li>
+                            <li><a href="{{ route("owner.property.calendar",['id'=>$property->id]) }}">Update Calendar</a></li>
+                            <li><a href="{{ route("owner.property.photos",['id'=>$property->id]) }}">Manage Photos</a></li>
+                            <li><a href="{{ route("property.details",['id'=>$property->id]) }}">Preview Listing</a></li>
                         </ul>
                     </div>
                 </div>
