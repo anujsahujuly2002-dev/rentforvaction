@@ -2,6 +2,13 @@ propertyDescription.onsubmit = async (e) => {
     e.preventDefault(e);
     showloader();
     try {
+        // Sync CKEditor 5 content back into the <textarea name="description">
+        // before FormData reads it, otherwise the textarea stays empty and the
+        // server-side `description: required` rule rejects the request.
+        if (typeof descriptionEditor !== "undefined" && descriptionEditor) {
+            document.querySelector("#description").value =
+                descriptionEditor.getData();
+        }
         res = await fetch(
             site_url + "/owner/property/store-property-information",
             {
