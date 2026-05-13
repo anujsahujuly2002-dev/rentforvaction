@@ -137,9 +137,9 @@
                   <ul class="nav nav-tabs tabs-left sideways" role="tablist">
                     <li class="nav-item" role="presentation"><a class="nav-link active" data-bs-toggle="tab" href="#edit-profile" role="tab">Edit profile</a></li>
                     <li class="nav-item" role="presentation"><a class="nav-link" data-bs-toggle="tab" href="#photo" role="tab">Photo</a></li>
-                    <li class="nav-item" role="presentation"><a class="nav-link" data-bs-toggle="tab" href="#account" role="tab">Owner Address</a></li>
-                    <li class="nav-item" role="presentation"><a class="nav-link" data-bs-toggle="tab" href="#billing" role="tab">Billing Details</a></li>
-                    <li class="nav-item" role="presentation"><a class="nav-link" data-bs-toggle="tab" href="#password" role="tab">Changes Password</a></li>
+                    {{-- <li class="nav-item" role="presentation"><a class="nav-link" data-bs-toggle="tab" href="#account" role="tab">Owner Address</a></li>
+                    <li class="nav-item" role="presentation"><a class="nav-link" data-bs-toggle="tab" href="#billing" role="tab">Billing Details</a></li> --}}
+                    <li class="nav-item" role="presentation"><a class="nav-link" data-bs-toggle="tab" href="#password" role="tab">Change Password</a></li>
                   </ul>
                 </div>
 

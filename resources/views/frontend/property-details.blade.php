@@ -357,8 +357,8 @@
             <div class="col-sm-4 col-md-4 col-lg-4 form-box">
                 <!-- OWNER CARD -->
                 <div class="owner-card mb-3">
-                    @if($propertyDetail?->user?->owner_image !=null)
-                        <img src="{{env('IMAGE_URL')}}/upload/{{ $propertyDetail?->user?->owner_image }}" class="owner-img" alt="Owner Photo">
+                    @if($propertyDetail?->user?->userInformation?->profile_pic !=null)
+                        <img src="{{env('IMAGE_URL')}}/upload/profile_image/{{ $propertyDetail?->user?->userInformation?->profile_pic }}" class="owner-img" alt="Owner Photo">
                     @else
                         <img src="{{ asset('frontend-assets/images/1.jpg') }}" class="owner-img" alt="Default Owner Photo">
                     @endif
