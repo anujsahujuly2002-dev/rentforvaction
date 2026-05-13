@@ -238,6 +238,38 @@
                                 </div>
                             </div>
                             @endif
+
+                            @if($propertyDetail->rental_policies || $propertyDetail->upload_rental_policies)
+                            <div class="rental-notes-section mt-3">
+                                <h5>Rental Policies</h5>
+                                @if($propertyDetail->rental_policies)
+                                    <div class="rental-notes-content">{!! nl2br(e($propertyDetail->rental_policies)) !!}</div>
+                                @endif
+                                @if($propertyDetail->upload_rental_policies)
+                                    <p class="mt-2">
+                                        <a href="{{ url('storage/upload/rental_policies/'.$propertyDetail->upload_rental_policies) }}" target="_blank" rel="noopener">
+                                            <i class="fa fa-file-text-o"></i> Download Rental Agreement
+                                        </a>
+                                    </p>
+                                @endif
+                            </div>
+                            @endif
+
+                            @if($propertyDetail->cancel_polices || $propertyDetail->upload_cancel_policies)
+                            <div class="rental-notes-section mt-3">
+                                <h5>Cancellation Policies</h5>
+                                @if($propertyDetail->cancel_polices)
+                                    <div class="rental-notes-content">{!! nl2br(e($propertyDetail->cancel_polices)) !!}</div>
+                                @endif
+                                @if($propertyDetail->upload_cancel_policies)
+                                    <p class="mt-2">
+                                        <a href="{{ url('storage/upload/rental_policies/'.$propertyDetail->upload_cancel_policies) }}" target="_blank" rel="noopener">
+                                            <i class="fa fa-file-text-o"></i> Download Cancellation Agreement
+                                        </a>
+                                    </p>
+                                @endif
+                            </div>
+                            @endif
                         </div>
                     </div>
                     <div class="col-sm-12 col-md-12 col-lg-12">
