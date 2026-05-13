@@ -41,8 +41,8 @@
                     <div class="listing-point">
                         <ul>
                             <li><a href="{{ route("owner.property.create",['id'=>$property->id,'type'=>"edit"]) }}">Edit Listing</a></li>
-                            <li><a href="{{ route("owner.property.calendar",['id'=>$property->id]) }}">Update Calendar</a></li>
-                            <li><a href="{{ route("owner.property.photos",['id'=>$property->id]) }}">Manage Photos</a></li>
+                            <li><a href="{{ route("owner.property.calender",['id'=>$property->id,'type'=>"edit"]) }}">Update Calendar</a></li>
+                            <li><a href="{{ route("owner.property.gallery.image",['id'=>$property->id,'type'=>"edit"]) }}">Manage Photos</a></li>
                             <li><a href="{{ route("property.details",['id'=>$property->id]) }}">Preview Listing</a></li>
                         </ul>
                     </div>
