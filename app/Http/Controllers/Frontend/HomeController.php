@@ -11,6 +11,8 @@ use App\Http\Helper\Helper;
 use App\Models\PropertyBooking;
 use App\Models\PropertyExportIcal;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 
 class HomeController extends Controller
@@ -27,6 +29,45 @@ class HomeController extends Controller
 
     public function contact() {
         return view('frontend.contact-us');
+    }
+
+    public function submitContact(Request $request)
+    {
+        $validated = $request->validate([
+            'name'    => 'required|string|max:100',
+            'phone'   => 'required|string|max:20',
+            'email'   => 'required|email|max:150',
+            'message' => 'required|string|max:2000',
+            'captcha' => 'required|captcha',
+        ], [
+            'captcha.required' => 'Please enter the captcha.',
+            'captcha.captcha'  => 'Invalid captcha. Please try again.',
+        ]);
+
+        try {
+            $body = "New contact message from rentforvacations.com\n\n"
+                  . "Name: {$validated['name']}\n"
+                  . "Phone: {$validated['phone']}\n"
+                  . "Email: {$validated['email']}\n\n"
+                  . "Message:\n{$validated['message']}\n";
+
+            Mail::raw($body, function ($m) use ($validated) {
+                $m->to('support@rentforvacations.com')
+                  ->subject('New Contact Message - ' . $validated['name'])
+                  ->replyTo($validated['email'], $validated['name']);
+            });
+
+            return response()->json([
+                'status' => 200,
+                'msg'    => 'Thank you! Your message has been sent.',
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Contact form email failed: ' . $e->getMessage());
+            return response()->json([
+                'status' => 500,
+                'msg'    => 'Failed to send your message. Please try again later.',
+            ], 500);
+        }
     }
 
     public function bookNow() {

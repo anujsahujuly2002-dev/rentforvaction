@@ -17,6 +17,7 @@ Route::controller(HomeController::class)->name('frontend.')->group(function () {
     Route::get('/', 'index')->name('index');
     Route::get('/destination', 'destination')->name('destination');
     Route::get('/contact-us', 'contact')->name('contact-us');
+    Route::post('/contact-us', 'submitContact')->name('contact-us.submit');
     Route::get('/book-now', 'bookNow')->name('book-now');
     Route::get('/log-in', 'logIn')->name('log-in');
     Route::get('/register', 'register')->name('register');

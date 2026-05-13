@@ -14,6 +14,89 @@
 @endpush
 @section('css1')
 <style>
+    /* Captcha block (inquiry form) */
+    .captcha-label {
+        display: block;
+        font-weight: 600;
+        font-size: 13px;
+        color: #374151;
+        margin-bottom: 6px;
+        letter-spacing: 0.2px;
+    }
+    .captcha-box {
+        display: flex;
+        align-items: stretch;
+        gap: 10px;
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 10px;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+        flex-wrap: wrap;
+    }
+    .captcha-image-wrap {
+        flex: 0 0 auto;
+        background: #fff;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid #e5e7eb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 4px 10px;
+        min-height: 52px;
+    }
+    .captcha-image-wrap img#captcha-image {
+        display: block;
+        height: 44px;
+        max-width: 100%;
+        cursor: pointer;
+    }
+    .captcha-refresh {
+        flex: 0 0 auto;
+        width: 42px;
+        height: 42px;
+        align-self: center;
+        border: 0;
+        border-radius: 50%;
+        background: #2563eb;
+        color: #fff;
+        font-size: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+        transition: transform 0.4s ease, background 0.15s ease;
+    }
+    .captcha-refresh:hover {
+        background: #1d4ed8;
+        transform: rotate(180deg);
+    }
+    .captcha-input {
+        flex: 1;
+        min-width: 0;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        background: #fff;
+        padding: 10px 14px;
+        font-size: 14px;
+        font-weight: 500;
+        letter-spacing: 1px;
+        color: #111827;
+        transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    .captcha-input:focus {
+        outline: none;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+    .captcha-input::placeholder {
+        font-weight: 400;
+        letter-spacing: 0.3px;
+        color: #9ca3af;
+    }
+
     .navigation {
         position: relative;
         z-index: 99;
@@ -461,14 +544,16 @@
                                     <textarea name="message" id="message" class="form-control mt-3" placeholder="Write message here..."></textarea>
                                 </div>
                                 <div class="form-group col-sm-12 p-1">
-                                    <label>Enter Captcha</label>
-                                    <div class="d-flex align-items-center gap-2 mb-1">
-                                        <img id="captcha-image" src="{{ captcha_src('flat') }}" alt="captcha" style="cursor:pointer; height:40px;" title="Click to refresh">
-                                        <button type="button" class="btn btn-sm btn-outline-secondary" id="refreshCaptcha" title="Refresh Captcha">
+                                    <label class="captcha-label">Verify you're human</label>
+                                    <div class="captcha-box">
+                                        <div class="captcha-image-wrap">
+                                            <img id="captcha-image" src="{{ captcha_src('flat') }}" alt="captcha" title="Click to refresh">
+                                        </div>
+                                        <button type="button" id="refreshCaptcha" class="captcha-refresh" title="Refresh captcha">
                                             <i class="fa fa-refresh"></i>
                                         </button>
+                                        <input type="text" name="captcha" class="captcha-input" placeholder="Type the code above" required autocomplete="off">
                                     </div>
-                                    <input type="text" name="captcha" class="form-control" placeholder="Enter captcha text" required autocomplete="off">
                                     <small class="text-danger error-captcha"></small>
                                 </div>
                                 <div class="col-sm-12 p-1">
