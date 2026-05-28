@@ -654,6 +654,13 @@
                 redirectToPropertyDetails(keyword);
                 return false;
             }
+
+
+            
+            // If text typed but no dropdown item selected, copy to search_text for text search
+            if (keyword.length > 0 && !document.getElementById('state_id').value) {
+                document.getElementById('search_text').value = keyword;
+            }
         });
 
         function redirectToPropertyDetails(propertyId) {

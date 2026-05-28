@@ -17,6 +17,8 @@ Route::prefix('owner')->name('owner.')->group(function(){
         Route::controller(HomeController::class)->group(function() {
             Route::get('/dashboard','dashboard')->name('dashboard');
             Route::get('/my-profile','myProfile')->name('myprofile');
+
+            Route::get('/inquiries','inquiries')->name('inquiries');
             Route::post('/edit-profile','editProfile');
             Route::get('/logout','logOut')->name('logout');
             Route::post('/profile-photo','profilePhoto');
@@ -53,6 +55,8 @@ Route::prefix('owner')->name('owner.')->group(function(){
             Route::post('/update-rental-rates','updateRentalRates');
             Route::post('/edit-property-reviews','editPropertyRevies');
             Route::post('/update-property-reviews','updatePropertyRevies');
+            Route::get('/enquiry','enquiry')->name('enquiry');
+            Route::post('/submit-enquiry','submitEnquiry');
         });
     });
 

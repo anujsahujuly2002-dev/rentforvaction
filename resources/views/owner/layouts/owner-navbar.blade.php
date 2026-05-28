@@ -7,7 +7,7 @@
         class="active"
     @endif>My Properties</a>
     {{-- <a href="javascript:void(0)">Specials/Deals</a> --}}
-    <a href="javascript:void(0)">Inquiries</a>
+    <a href="{{ route('owner.inquiries') }}" @if(request()->route()->getName()=='owner.inquiries') class="active" @endif>Inquiries</a>
     <a href="javascript:void(0);" class="icon" onclick="myFunction()">
         <i class="fa fa-bars"></i>
     </a>

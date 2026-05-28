@@ -19,6 +19,11 @@ class HomeController extends Controller
         return view('owner.dashboard',compact('properties'));
     }
 
+    public function inquiries(){
+        $properties = Property::where('user_id',Auth()->user()->id)->get();
+        return view('owner.inquiries',compact('properties'));
+    }
+
     public function myProfile (){
         return view('owner.my-profile');
     }

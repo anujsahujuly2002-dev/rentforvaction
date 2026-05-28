@@ -30,13 +30,24 @@ class PropertyController extends Controller
         $city_name='';
         $sub_city_name='';
         $search_text = '';
-        $propertyListings = Property::where('state_id',$request->input('state_id'))->where('property_approved','1');
+        $type = '';
+
         $amenities = Aminities::where('status','1')->get();
         $propertyTypes = PropertyTypes::get();
         $country_name = Country::where('id',$request->input('country_id'))->first();
         $state_name = State::where('id',$request->input('state_id'))->first();
+
         if ($request->filled('search_text')) {
             $search_text = $request->input('search_text');
+        }
+
+        // Free-text search: no location selected from dropdown
+        if (!$request->filled('state_id') && $request->filled('search_text')) {
+            $keyword = $request->input('search_text');
+            $propertyListings = Property::where('property_approved', '1')
+                ->where('property_name', 'like', '%' . $keyword . '%');
+        } else {
+            $propertyListings = Property::where('state_id', $request->input('state_id'))->where('property_approved','1');
         }
 
         if($request->input('type')=='state' || $request->input('type')=='State'):

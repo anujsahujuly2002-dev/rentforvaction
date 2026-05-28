@@ -293,7 +293,7 @@
     @endif
 @endpush
 @section('title')
-    Property Create
+    {{ isset($property) ? 'Edit Property #' . $property->id : 'Property Create' }}
 @endsection
 @section('content')
     <!-- Content -->
@@ -301,7 +301,13 @@
         @include('toaster.toaster')
         <div class="row">
             <div class="col-md-6">
-                <h4 class="fw-bold py-3 mb-4">Property Create</h4>
+                <h4 class="fw-bold py-3 mb-4">
+                    @if(isset($property))
+                        Edit Property <span class="badge bg-label-secondary ms-1">#{{ $property->id }}</span>
+                    @else
+                        Property Create
+                    @endif
+                </h4>
             </div>
             <div class="col-md-6">
                 <a href="{{ route('admin.property.index') }}" class="btn btn-primary text-right" style="float: right">Back</a>

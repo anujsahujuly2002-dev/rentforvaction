@@ -28,7 +28,10 @@ use Auth;
 use Carbon\Carbon;
 use DataTables;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
+use App\Mail\PropertyInquiry;
+use App\Mail\PropertyInquiryConfirmation;
 
 
 class PropertyController extends Controller
@@ -700,5 +703,61 @@ class PropertyController extends Controller
             'status' => '0',
             'msg' => 'Booking not found.'
         ]);
+    }
+
+    public function enquiry(Request $request)
+    {
+        $property = null;
+        if ($request->id && $request->type === 'edit') {
+            $property = Property::findOrFail($request->id);
+        }
+        return view('owner.property.enquiry', compact('property'));
+    }
+
+    public function submitEnquiry(Request $request)
+    {
+        $request->validate([
+            'property_id' => 'required|exists:properties,id',
+            'first_name'  => 'required|string|max:100',
+            'last_name'   => 'required|string|max:100',
+            'phone'       => 'required|string|max:20',
+            'email'       => 'required|email|max:150',
+            'checkin'     => 'nullable|date',
+            'checkout'    => 'nullable|date|after_or_equal:checkin',
+            'adults'      => 'nullable|integer|min:0|max:20',
+            'children'    => 'nullable|integer|min:0|max:20',
+            'message'     => 'nullable|string|max:2000',
+        ]);
+
+        try {
+            $property = Property::with('user')->findOrFail($request->property_id);
+
+            $inquiryData = [
+                'property_id'   => $property->id,
+                'property_name' => $property->property_name,
+                'first_name'    => $request->first_name,
+                'last_name'     => $request->last_name,
+                'phone'         => $request->phone,
+                'email'         => $request->email,
+                'checkin'       => $request->checkin,
+                'checkout'      => $request->checkout,
+                'adults'        => $request->adults ?? 0,
+                'children'      => $request->children ?? 0,
+                'message'       => $request->message,
+            ];
+
+            $ownerEmail = $property->user->email ?? null;
+
+            if ($ownerEmail) {
+                Mail::to($ownerEmail)->send(new PropertyInquiry($inquiryData));
+                Mail::to('varunchanana1788@gmail.com')->send(new PropertyInquiry($inquiryData));
+            }
+
+            Mail::to($request->email)->send(new PropertyInquiryConfirmation($inquiryData));
+
+            return response()->json(['status' => 200, 'msg' => 'Enquiry sent successfully!']);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 500, 'msg' => 'Failed to send enquiry. Please try again.'], 500);
+        }
     }
 }
