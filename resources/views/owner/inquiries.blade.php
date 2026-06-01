@@ -1,23 +1,13 @@
 @extends('frontend.layouts.master')
 @push('css')
     <link rel="stylesheet" href="{{ asset('frontend-assets/css/dashboard.css') }}">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <style>
-        .enquiry-card {
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
-            padding: 30px;
-        }
-        .enquiry-card .form-label {
-            font-weight: 500;
-            color: #444;
-        }
-        .enquiry-card input.form-control,
-        .enquiry-card select.form-control,
-        .enquiry-card textarea.form-control {
-            border-radius: 6px;
-        }
+        .inquiry-table th { background: #f8f9fa; font-weight: 600; }
+        .inquiry-table td { vertical-align: middle; }
+        .msg-cell { max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .badge-source { font-size: 11px; padding: 3px 8px; border-radius: 20px; }
+        .badge-frontend { background: #e3f0ff; color: #1a6fc4; }
+        .badge-owner    { background: #e8f5e9; color: #2e7d32; }
     </style>
 @endpush
 @push('div_start')
@@ -34,86 +24,76 @@
             @include('owner.layouts.owner-navbar')
 
             <div class="property-mainsection mt-4">
-                <div class="row justify-content-center">
-                    <div class="col-md-8">
-                        <div id="enquiry-alert" style="display:none;" class="alert mb-3"></div>
-                        <form id="ownerEnquiryForm">
-                            @csrf
-                            <div class="enquiry-card">
-                                <div class="row g-3">
-                                    <div class="col-md-12">
-                                        <label class="form-label">Select Property <span class="text-danger">*</span></label>
-                                        <select name="property_id" class="form-control">
-                                            <option value="">-- Select Property --</option>
-                                            @foreach($properties as $property)
-                                                <option value="{{ $property->id }}">{{ $property->property_name }}</option>
-                                            @endforeach
-                                        </select>
-                                        <small class="text-danger error-property_id"></small>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">First Name <span class="text-danger">*</span></label>
-                                        <input type="text" name="first_name" class="form-control" placeholder="First Name">
-                                        <small class="text-danger error-first_name"></small>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Last Name <span class="text-danger">*</span></label>
-                                        <input type="text" name="last_name" class="form-control" placeholder="Last Name">
-                                        <small class="text-danger error-last_name"></small>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Phone <span class="text-danger">*</span></label>
-                                        <input type="tel" name="phone" class="form-control" placeholder="Phone Number">
-                                        <small class="text-danger error-phone"></small>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Email <span class="text-danger">*</span></label>
-                                        <input type="email" name="email" class="form-control" placeholder="Email Address">
-                                        <small class="text-danger error-email"></small>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Check In</label>
-                                        <input type="text" name="checkin" id="enquiry-checkin" class="form-control" placeholder="Arrival date" autocomplete="off" readonly>
-                                        <small class="text-danger error-checkin"></small>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Check Out</label>
-                                        <input type="text" name="checkout" id="enquiry-checkout" class="form-control" placeholder="Departure date" autocomplete="off" readonly>
-                                        <small class="text-danger error-checkout"></small>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Adults</label>
-                                        <select name="adults" class="form-control">
-                                            <option value="0">Select Adults</option>
-                                            @for($i = 1; $i <= 10; $i++)
-                                                <option value="{{ $i }}">{{ $i }}</option>
-                                            @endfor
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Children</label>
-                                        <select name="children" class="form-control">
-                                            <option value="0">Select Children</option>
-                                            @for($i = 1; $i <= 10; $i++)
-                                                <option value="{{ $i }}">{{ $i }}</option>
-                                            @endfor
-                                        </select>
-                                    </div>
-                                    <div class="col-md-12">
-                                        <label class="form-label">Message</label>
-                                        <textarea name="message" class="form-control" rows="4" placeholder="Write your message here..."></textarea>
-                                        <small class="text-danger error-message"></small>
-                                    </div>
-                                    <div class="col-md-12">
-                                        <button type="submit" id="enquirySubmitBtn" class="button preview">
-                                            Send Enquiry <i class="fa fa-paper-plane-o ms-1"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
+
+                {{-- Filter bar --}}
+                <form method="GET" action="{{ route('owner.inquiries') }}" class="mb-3 d-flex align-items-center gap-2" style="gap:10px;">
+                    <select name="property_filter" class="form-control" style="max-width:280px;">
+                        <option value="">All Properties</option>
+                        @foreach($properties as $prop)
+                            <option value="{{ $prop->id }}" {{ request('property_filter') == $prop->id ? 'selected' : '' }}>
+                                {{ $prop->property_name }}
+                            </option>
+                        @endforeach
+                    </select>
+                    <button type="submit" class="button preview" style="padding:8px 18px;">Filter</button>
+                    @if(request('property_filter'))
+                        <a href="{{ route('owner.inquiries') }}" class="button" style="padding:8px 18px;">Clear</a>
+                    @endif
+                </form>
+
+                @if($inquiries->isEmpty())
+                    <div class="alert alert-info">No inquiries found.</div>
+                @else
+                    <div class="table-responsive">
+                        <table class="table table-bordered inquiry-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Property</th>
+                                    <th>Guest</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Check-In</th>
+                                    <th>Check-Out</th>
+                                    <th>Guests</th>
+                                    <th>Message</th>
+                                    <th>Source</th>
+                                    <th>Date</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($inquiries as $i => $inq)
+                                    <tr id="inq-row-{{ $inq->id }}">
+                                        <td>{{ $inquiries->firstItem() + $i }}</td>
+                                        <td>{{ $inq->property_name }}</td>
+                                        <td>{{ $inq->first_name }} {{ $inq->last_name }}</td>
+                                        <td>{{ $inq->email }}</td>
+                                        <td>{{ $inq->phone }}</td>
+                                        <td>{{ $inq->checkin ? date('M d, Y', strtotime($inq->checkin)) : '-' }}</td>
+                                        <td>{{ $inq->checkout ? date('M d, Y', strtotime($inq->checkout)) : '-' }}</td>
+                                        <td>{{ $inq->adults }}A / {{ $inq->children }}C</td>
+                                        <td class="msg-cell" title="{{ $inq->message }}">{{ $inq->message ?: '-' }}</td>
+                                        <td>
+                                            <span class="badge-source badge-{{ $inq->source }}">{{ ucfirst($inq->source) }}</span>
+                                        </td>
+                                        <td>{{ $inq->created_at->format('M d, Y') }}</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-danger delete-inquiry-btn"
+                                                    data-id="{{ $inq->id }}">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
                     </div>
-                </div>
+                    <div class="mt-3">
+                        {{ $inquiries->links() }}
+                    </div>
+                @endif
+
             </div>
         </div>
     </div>
@@ -121,65 +101,30 @@
 @endsection
 
 @push('js')
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
 $(function () {
-    var checkinPicker = flatpickr('#enquiry-checkin', {
-        dateFormat: 'Y-m-d',
-        minDate: 'today',
-        onChange: function (selectedDates) {
-            if (selectedDates.length) {
-                checkoutPicker.set('minDate', selectedDates[0]);
-            }
-        }
-    });
-
-    var checkoutPicker = flatpickr('#enquiry-checkout', {
-        dateFormat: 'Y-m-d',
-        minDate: 'today',
-    });
-
-    $('#ownerEnquiryForm').on('submit', function (e) {
-        e.preventDefault();
-
-        var $btn = $('#enquirySubmitBtn');
-        $btn.prop('disabled', true).text('Sending...');
-        $('small[class^="error-"]').text('');
-        $('#enquiry-alert').hide().removeClass('alert-success alert-danger');
+    $(document).on('click', '.delete-inquiry-btn', function () {
+        var id  = $(this).data('id');
+        if (!confirm('Delete this inquiry?')) return;
 
         showloader();
-
         $.ajax({
-            url: site_url + '/owner/property/submit-enquiry',
+            url: site_url + '/owner/delete-inquiry',
             method: 'POST',
             headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
-            data: $(this).serialize(),
+            data: { id: id },
             success: function (res) {
                 hideLoader();
-                $btn.prop('disabled', false).html('Send Enquiry <i class="fa fa-paper-plane-o ms-1"></i>');
                 if (res.status === 200) {
+                    $('#inq-row-' + id).fadeOut(300, function () { $(this).remove(); });
                     toastr.success(res.msg);
-                    $('#enquiry-alert')
-                        .removeClass('alert-danger').addClass('alert-success alert show')
-                        .text(res.msg).show();
-                    $('#ownerEnquiryForm')[0].reset();
-                    checkinPicker.clear();
-                    checkoutPicker.clear();
                 } else {
                     toastr.error(res.msg);
                 }
             },
-            error: function (xhr) {
+            error: function () {
                 hideLoader();
-                $btn.prop('disabled', false).html('Send Enquiry <i class="fa fa-paper-plane-o ms-1"></i>');
-                if (xhr.status === 422) {
-                    var errors = xhr.responseJSON.errors;
-                    $.each(errors, function (field, messages) {
-                        $('small.error-' + field).text(messages[0]);
-                    });
-                } else {
-                    toastr.error('Something went wrong. Please try again.');
-                }
+                toastr.error('Something went wrong. Please try again.');
             }
         });
     });

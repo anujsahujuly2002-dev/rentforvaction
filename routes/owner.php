@@ -19,6 +19,7 @@ Route::prefix('owner')->name('owner.')->group(function(){
             Route::get('/my-profile','myProfile')->name('myprofile');
 
             Route::get('/inquiries','inquiries')->name('inquiries');
+            Route::post('/delete-inquiry','deleteInquiry')->name('delete.inquiry');
             Route::post('/edit-profile','editProfile');
             Route::get('/logout','logOut')->name('logout');
             Route::post('/profile-photo','profilePhoto');

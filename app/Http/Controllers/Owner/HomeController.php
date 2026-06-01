@@ -11,6 +11,7 @@ use Session;
 use App\Http\Requests\Owner\ChangePasswordRequest;
 use Hash;
 use App\Models\Property;
+use App\Models\Inquiry;
 
 class HomeController extends Controller
 {
@@ -19,9 +20,26 @@ class HomeController extends Controller
         return view('owner.dashboard',compact('properties'));
     }
 
-    public function inquiries(){
-        $properties = Property::where('user_id',Auth()->user()->id)->get();
-        return view('owner.inquiries',compact('properties'));
+    public function inquiries(Request $request){
+        $propertyIds = Property::where('user_id', Auth()->user()->id)->pluck('id');
+        $properties  = Property::where('user_id', Auth()->user()->id)->get();
+
+        $query = Inquiry::whereIn('property_id', $propertyIds)->latest();
+
+        if ($request->filled('property_filter')) {
+            $query->where('property_id', $request->property_filter);
+        }
+
+        $inquiries = $query->paginate(20)->withQueryString();
+
+        return view('owner.inquiries', compact('inquiries', 'properties'));
+    }
+
+    public function deleteInquiry(Request $request){
+        $propertyIds = Property::where('user_id', Auth()->user()->id)->pluck('id');
+        $inquiry = Inquiry::whereIn('property_id', $propertyIds)->findOrFail($request->id);
+        $inquiry->delete();
+        return response()->json(['status' => 200, 'msg' => 'Inquiry deleted successfully.']);
     }
 
     public function myProfile (){

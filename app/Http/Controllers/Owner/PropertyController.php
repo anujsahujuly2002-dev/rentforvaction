@@ -32,6 +32,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use App\Mail\PropertyInquiry;
 use App\Mail\PropertyInquiryConfirmation;
+use App\Models\Inquiry;
 
 
 class PropertyController extends Controller
@@ -709,9 +710,12 @@ class PropertyController extends Controller
     {
         $property = null;
         if ($request->id && $request->type === 'edit') {
-            $property = Property::findOrFail($request->id);
+            $property = Property::where('id', $request->id)
+                ->where('user_id', Auth::id())
+                ->firstOrFail();
         }
-        return view('owner.property.enquiry', compact('property'));
+        $ownerProperties = Property::where('user_id', Auth::id())->get();
+        return view('owner.property.enquiry', compact('property', 'ownerProperties'));
     }
 
     public function submitEnquiry(Request $request)
@@ -729,9 +733,16 @@ class PropertyController extends Controller
             'message'     => 'nullable|string|max:2000',
         ]);
 
-        try {
-            $property = Property::with('user')->findOrFail($request->property_id);
+        $property = Property::with('user')
+            ->where('id', $request->property_id)
+            ->where('user_id', Auth::id())
+            ->first();
 
+        if (!$property) {
+            return response()->json(['status' => 422, 'msg' => 'Invalid property selected.'], 422);
+        }
+
+        try {
             $inquiryData = [
                 'property_id'   => $property->id,
                 'property_name' => $property->property_name,
@@ -754,6 +765,8 @@ class PropertyController extends Controller
             }
 
             Mail::to($request->email)->send(new PropertyInquiryConfirmation($inquiryData));
+
+            Inquiry::create(array_merge($inquiryData, ['source' => 'owner']));
 
             return response()->json(['status' => 200, 'msg' => 'Enquiry sent successfully!']);
         } catch (\Exception $e) {

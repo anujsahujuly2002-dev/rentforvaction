@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\PropertyInquiry;
 use App\Mail\PropertyInquiryConfirmation;
+use App\Models\Inquiry;
 
 class PropertyController extends Controller
 {
@@ -248,6 +249,8 @@ class PropertyController extends Controller
 
             // Send confirmation email to traveller
             Mail::to($request->email)->send(new PropertyInquiryConfirmation($inquiryData));
+
+            Inquiry::create(array_merge($inquiryData, ['source' => 'frontend']));
 
             return response()->json(['status' => 'success', 'message' => 'Your inquiry has been sent successfully!']);
         } catch (\Exception $e) {

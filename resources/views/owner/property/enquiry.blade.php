@@ -43,7 +43,22 @@
                                 <div id="enquiry-alert" style="display:none;" class="alert mb-3"></div>
                                 <form id="ownerEnquiryForm">
                                     @csrf
-                                    <input type="hidden" name="property_id" value="{{ request()->id }}">
+                                    @if($property)
+                                        <input type="hidden" name="property_id" value="{{ $property->id }}">
+                                    @else
+                                        <div class="row g-3 mb-2">
+                                            <div class="col-md-12">
+                                                <label class="form-label">Select Property <span class="text-danger">*</span></label>
+                                                <select name="property_id" class="form-control">
+                                                    <option value="">-- Select Property --</option>
+                                                    @foreach($ownerProperties as $op)
+                                                        <option value="{{ $op->id }}">{{ $op->property_name }}</option>
+                                                    @endforeach
+                                                </select>
+                                                <small class="text-danger error-property_id"></small>
+                                            </div>
+                                        </div>
+                                    @endif
                                     <div class="enquiry-card">
                                         <div class="row g-3">
                                             <div class="col-md-6">
