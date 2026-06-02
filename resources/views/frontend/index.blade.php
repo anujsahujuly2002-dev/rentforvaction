@@ -108,7 +108,7 @@
                             <div class="col-sm-2 col-md-2">
                                 <div class="mb-3 check-position">
                                     <!-- <label for="checkIn" class="form-label">Check In</label> -->
-                                    <input type="text" id="checkIn" class="form-control form-control2"
+                                    <input type="text" id="checkIn" name="checkin" class="form-control form-control2"
                                         placeholder="check-in" readonly>
                                     <span><i class="bi bi-calendar2-week"></i></span>
                                 </div>
@@ -116,14 +116,14 @@
                             <div class="col-sm-2 col-md-2">
                                 <div class="mb-3 check-position">
                                     <!-- <label for="checkOut" class="form-label">Check Out</label> -->
-                                    <input type="text" id="checkOut" class="form-control form-control2"
+                                    <input type="text" id="checkOut" name="checkout" class="form-control form-control2"
                                         placeholder="check-out" readonly>
                                     <span><i class="bi bi-calendar2-week"></i></span>
                                 </div>
                             </div>
                             <div class="col-sm-2 col-md-2">
                                 <div class="check-position mb-3">
-                                    <select name="" id="" class="form-control form-control2" aria-describedby="basic-addon44">
+                                    <select name="sleeps" id="" class="form-control form-control2" aria-describedby="basic-addon44">
                                         <option value="">Select Guest</option>
                                         @for($i = 1; $i <= 10; $i++)
                                             @if($i == 10)

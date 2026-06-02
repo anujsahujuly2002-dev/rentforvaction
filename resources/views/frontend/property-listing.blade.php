@@ -23,21 +23,29 @@
 <section class="breadcrumb inner-breadcrumb-area">
     <div class="container-xxl">
         <ul>
+            <li><a href="{{ route('frontend.index') }}">Home</a></li>
+            @if($search_text && !$country_name)
+            <li>Search: "{{ $search_text }}"</li>
+            @endif
+            @if($country_name)
             <li>
                 <a href="{{ route('frontend.destination') }}">
                     {{ strlen($country_name->name)<=3?strtoupper($country_name->name):ucfirst($country_name->name) }}
                 </a>
             </li>
-            @if(request()->input('type')=="state")
-            <li>
-                {{ ucfirst($state_name->name) }} Vacation Rentals
-            </li>
-            @else
-            <li>
-                <a href="{{ route('property.listing',['country_id'=>$state_name->country_id,'state_id'=>$state_name->id,'type'=>'state']) }}">
-                    {{ strlen($state_name->name)<=3?strtoupper($state_name->name):ucfirst($state_name->name) }}
-                </a>
-            </li>
+            @endif
+            @if($state_name)
+                @if(request()->input('type')=="state")
+                <li>
+                    {{ ucfirst($state_name->name) }} Vacation Rentals
+                </li>
+                @else
+                <li>
+                    <a href="{{ route('property.listing',['country_id'=>$state_name->country_id,'state_id'=>$state_name->id,'type'=>'state']) }}">
+                        {{ strlen($state_name->name)<=3?strtoupper($state_name->name):ucfirst($state_name->name) }}
+                    </a>
+                </li>
+                @endif
             @endif
             @if(request()->input('type')=='Region' )
             <li>
@@ -65,7 +73,7 @@
                 </li>
                 @endif
             @endif
-            @if(request()->input('type')=='SubCity')
+            @if(request()->input('type')=='SubCity' && $sub_city_name)
                 <li>
                     {{ ucfirst($sub_city_name->name) }} Vacation Rentals
                 </li>
@@ -78,14 +86,16 @@
         <div class="row">
             <div class="col-md-8 mt-3">
                 <div class="area-heading">
-                    @if(request()->input('type')=="state")
+                    @if(request()->input('type')=="state" && $state_name)
                     <h1>{{ ucfirst($state_name->name) }} Vacation Rentals By Owner</h1>
-                    @elseif(request()->input('type')=='Region')
+                    @elseif(request()->input('type')=='Region' && $region_name)
                     <h1>{{ ucfirst($region_name->name) }} Vacation Rentals By Owner</h1>
-                    @elseif(request()->input('type')=='City' )
+                    @elseif(request()->input('type')=='City' && $city_name)
                     <h1>{{ ucfirst($city_name->name) }} Vacation Rentals By Owner</h1>
-                    @elseif(request()->input('type')=='SubCity')
+                    @elseif(request()->input('type')=='SubCity' && $sub_city_name)
                     <h1>{{ ucfirst($sub_city_name->name) }} Vacation Rentals By Owner</h1>
+                    @elseif($search_text)
+                    <h1>Search Results for "{{ $search_text }}"</h1>
                     @endif
                 </div>
             </div>
@@ -334,7 +344,6 @@
             document.getElementById('region_id').value = item.region_id ?? '';
             document.getElementById('search_type').value = item.type ?? '';
             document.getElementById('state_id').value = item.state_id ?? '';
-            document.getElementById('search_text').value = item.full_address ?? '';
         }
     </script>
 

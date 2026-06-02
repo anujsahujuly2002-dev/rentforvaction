@@ -73,8 +73,8 @@ class PropertyController extends Controller
             $city_name = City::where('id',$request->input('city_id'))->first();
             $type = "SubCity";
             $subCities = SubCity::where('city_id',$request->input('city_id'))->get();
-            $propertyListings = $propertyListings->where('sub_city_id',$request->input('subcity_id'));
-            $sub_city_name = SubCity::where('id',$request->input('subcity_id'))->first();
+            $propertyListings = $propertyListings->where('sub_city_id',$request->input('sub_city_id'));
+            $sub_city_name = SubCity::where('id',$request->input('sub_city_id'))->first();
         endif;
         if ($request->type === 'city') {
             $region_name = Region::find($request->region_id);
@@ -102,7 +102,44 @@ class PropertyController extends Controller
             $type = "SubCity";
         }
 
-        $propertyListings = $propertyListings->orderByRaw('CASE WHEN user_id = 1 THEN 1 ELSE 0 END')->orderBy('id','ASC')->paginate(15);
+        if ($request->filled('beds') && $request->input('beds') !== '') {
+            $propertyListings = $propertyListings->where('bedrooms', '>=', $request->input('beds'));
+        }
+        if ($request->filled('sleeps')) {
+            $propertyListings = $propertyListings->where('sleeps', '>=', $request->input('sleeps'));
+        }
+        if ($request->filled('property_type')) {
+            $propertyListings = $propertyListings->where('property_types_id', $request->input('property_type'));
+        }
+        if ($request->filled('checkin') && $request->filled('checkout')) {
+            $checkin  = $request->input('checkin');
+            $checkout = $request->input('checkout');
+            $propertyListings = $propertyListings->whereDoesntHave('propertyBooking', function ($q) use ($checkin, $checkout) {
+                $q->where('start_date', '<', $checkout)->where('end_date', '>', $checkin);
+            });
+        }
+        if ($request->filled('amenities')) {
+            $amenityIds = $request->input('amenities');
+            $propertyListings = $propertyListings->whereHas('property_amenites', function ($q) use ($amenityIds) {
+                $q->whereIn('sub_amenites_id', $amenityIds);
+            });
+        }
+
+        $propertyListings = $propertyListings->orderByRaw('CASE WHEN user_id = 1 THEN 1 ELSE 0 END');
+        $sortby = $request->input('sortby');
+        if ($sortby === 'updated') {
+            $propertyListings = $propertyListings->orderBy('updated_at', 'DESC');
+        } elseif ($sortby === 'bedsDesc') {
+            $propertyListings = $propertyListings->orderBy('bedrooms', 'DESC');
+        } elseif ($sortby === 'bedsAsc') {
+            $propertyListings = $propertyListings->orderBy('bedrooms', 'ASC');
+        } elseif ($sortby === 'rating') {
+            $propertyListings = $propertyListings->withCount('propertyReviews')->orderBy('property_reviews_count', 'DESC');
+        } else {
+            $propertyListings = $propertyListings->orderBy('id', 'ASC');
+        }
+
+        $propertyListings = $propertyListings->paginate(15);
 
         $propertyDataInMap = [];
         foreach($propertyListings as $property):

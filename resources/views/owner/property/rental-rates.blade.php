@@ -1,6 +1,7 @@
 @extends('frontend.layouts.master')
 @push('css')
     <link rel="stylesheet" href="{{ asset('frontend-assets/css/dashboard.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <style>
         .table-box table.basic-table th, table.basic-table td{
             padding: 8px;
@@ -39,13 +40,13 @@
                                     <!-- Status -->
                                     <div class="col-md-2">
                                         <label>Starts</label>
-                                        <input type="date" name="start_date" class="start_date form-control" autocomplete="off" min="{{ date('Y-m-d') }}">
+                                        <input type="text" name="start_date" class="start_date form-control" autocomplete="off" placeholder="Select date" readonly>
                                     </div>
 
                                     <!-- Type -->
                                     <div class="col-md-2">
                                         <label>Ends</label>
-                                        <input type="date" name="end_date" class="end_date form-control" autocomplete="off" min="{{ date('Y-m-d') }}">
+                                        <input type="text" name="end_date" class="end_date form-control" autocomplete="off" placeholder="Select date" readonly>
                                     </div>
 
                                     <div class="col-md-2">
@@ -293,14 +294,14 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="start_date" class="col-form-label">Starts:</label>
-                                            <input type="date" name="start_date" class="start_date form-control" autocomplete="off">
+                                            <label for="edit_start_date" class="col-form-label">Starts:</label>
+                                            <input type="text" id="edit_start_date" name="start_date" class="start_date form-control" autocomplete="off" placeholder="Select date" readonly>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="end_date" class="col-form-label">Ends:</label>
-                                            <input type="date" name="end_date" class="end_date form-control" autocomplete="off">
+                                            <label for="edit_end_date" class="col-form-label">Ends:</label>
+                                            <input type="text" id="edit_end_date" name="end_date" class="end_date form-control" autocomplete="off" placeholder="Select date" readonly>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
@@ -350,5 +351,6 @@
 
 @push('js')
     <script src="{{ asset('admin-auth-assets/js/common.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="{{ asset('frontend-assets/js/ownerJs/property/rental-rates.js') }}"></script>
 @endpush

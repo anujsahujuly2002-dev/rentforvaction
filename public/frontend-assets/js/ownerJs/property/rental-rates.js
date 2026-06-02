@@ -1,9 +1,67 @@
 let table;
+var addStartPicker = null;
+var addEndPicker = null;
+var editStartPicker = null;
+var editEndPicker = null;
 
 $(function () {
-    $(document).on("change", ".start_date", function () {
-        $(this).closest("form").find(".end_date").attr("min", $(this).val());
+    // Add form datepickers
+    addStartPicker = flatpickr("#rentalRates input[name=start_date]", {
+        dateFormat: "Y-m-d",
+        altInput: true,
+        altFormat: "M d, Y",
+        minDate: "today",
+        disableMobile: true,
+        onChange: function (selectedDates) {
+            if (selectedDates.length > 0) {
+                var nextDay = new Date(selectedDates[0]);
+                nextDay.setDate(nextDay.getDate() + 1);
+                addEndPicker.set("minDate", nextDay);
+                if (!addEndPicker.selectedDates.length || addEndPicker.selectedDates[0] <= selectedDates[0]) {
+                    addEndPicker.setDate(nextDay, true);
+                }
+            }
+        }
     });
+
+    addEndPicker = flatpickr("#rentalRates input[name=end_date]", {
+        dateFormat: "Y-m-d",
+        altInput: true,
+        altFormat: "M d, Y",
+        minDate: "today",
+        disableMobile: true,
+    });
+
+    // Edit modal datepickers (init on modal show)
+    $(document).on("shown.bs.modal", "#rentalRatesModel", function () {
+        if (!editStartPicker) {
+            editStartPicker = flatpickr("#edit_start_date", {
+                dateFormat: "Y-m-d",
+                altInput: true,
+                altFormat: "M d, Y",
+                disableMobile: true,
+                onChange: function (selectedDates) {
+                    if (selectedDates.length > 0) {
+                        var nextDay = new Date(selectedDates[0]);
+                        nextDay.setDate(nextDay.getDate() + 1);
+                        editEndPicker.set("minDate", nextDay);
+                        if (!editEndPicker.selectedDates.length || editEndPicker.selectedDates[0] <= selectedDates[0]) {
+                            editEndPicker.setDate(nextDay, true);
+                        }
+                    }
+                }
+            });
+        }
+        if (!editEndPicker) {
+            editEndPicker = flatpickr("#edit_end_date", {
+                dateFormat: "Y-m-d",
+                altInput: true,
+                altFormat: "M d, Y",
+                disableMobile: true,
+            });
+        }
+    });
+
     try {
         table = $("#rental-rates").DataTable({
             language: {
@@ -115,6 +173,8 @@ rentalRates.onsubmit = async (e) => {
         } */
         if (results.status == 200) {
             rentalRates.reset();
+            if (addStartPicker) addStartPicker.clear();
+            if (addEndPicker) addEndPicker.clear();
             toastr.success(results.msg);
             hideLoader();
             table.draw();
@@ -264,9 +324,28 @@ editRentalRates = async (id) => {
             hideLoader();
             $("#rentalRatesModel").modal("show");
             for (let index in results.data) {
+                if (index === "start_date" || index === "end_date") {
+                    // handled after modal shown via flatpickr
+                    continue;
+                }
                 $("#editRentalRatesFrom")
                     .find(`input[name=${index}]`)
                     .val(results.data[index]);
+            }
+            // Set date values after modal is visible so flatpickr is initialized
+            var setDatesOnModalShow = function () {
+                if (results.data.start_date && editStartPicker) {
+                    editStartPicker.setDate(results.data.start_date, true);
+                }
+                if (results.data.end_date && editEndPicker) {
+                    editEndPicker.setDate(results.data.end_date, true);
+                }
+                $("#rentalRatesModel").off("shown.bs.modal.setDates");
+            };
+            if (editStartPicker && editEndPicker) {
+                setDatesOnModalShow();
+            } else {
+                $("#rentalRatesModel").one("shown.bs.modal.setDates", setDatesOnModalShow);
             }
         }
     } catch (error) {
