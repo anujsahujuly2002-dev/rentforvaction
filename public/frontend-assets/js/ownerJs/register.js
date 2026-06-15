@@ -1,3 +1,8 @@
+function refreshCaptcha() {
+    const img = document.getElementById('captcha-image');
+    if (img) img.src = site_url + '/captcha/flat?' + Date.now();
+}
+
 ownerRegistration.onsubmit = async (e) => {
     showloader();
     e.preventDefault();
@@ -11,25 +16,27 @@ ownerRegistration.onsubmit = async (e) => {
             },
         });
         const result = await response.json();
-        console.log(result.status);
         if (result.status == 422) {
             hideLoader();
-            console.log(result.errors);
             $("span").text("");
             for (let error in result.errors) {
-                console.log(result.errors[error]);
                 $("." + error).text(result.errors[error]);
             }
+            // Always refresh captcha after a failed attempt
+            refreshCaptcha();
+            ownerRegistration.querySelector('[name="captcha"]').value = '';
         } else if (result.status == 200) {
             toastr.success(result.msg);
             window.setTimeout(() => {
                 hideLoader();
                 window.location.href = result.url;
-            }, 2000);
+            }, 3000);
+        } else {
+            hideLoader();
+            toastr.error(result.msg || 'Registration failed.');
         }
     } catch (error) {
         hideLoader();
         toastr.error(error.message);
-        console.log(error.message);
     }
 };

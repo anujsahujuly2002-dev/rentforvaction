@@ -334,6 +334,21 @@
                                                         </div>
                                                         <div class="col-lg-12 col-md-12">
                                                             <div class="form-group">
+                                                                <label class="captcha-label">Verify you're human</label>
+                                                                <div class="captcha-box">
+                                                                    <div class="captcha-image-wrap">
+                                                                        <img id="captcha-image" src="{{ captcha_src('flat') }}" alt="captcha" title="Click to refresh">
+                                                                    </div>
+                                                                    <button type="button" id="refreshCaptcha" class="captcha-refresh" title="Refresh captcha">
+                                                                        <i class="fa fa-refresh"></i>
+                                                                    </button>
+                                                                    <input type="text" name="captcha" class="captcha-input" placeholder="Type the code above" autocomplete="off">
+                                                                </div>
+                                                                <span class="captcha text-danger"></span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-12 col-md-12">
+                                                            <div class="form-group">
                                                                 <div class="comment-btn">
                                                                     <button type="submit" name="submit" class="pop-login" style="color:#fff;font-size: 22px;line-height: 22px;font-weight: 600;">Register Now</button>
                                                                 </div>
@@ -359,6 +374,24 @@
     </section>
 @endsection
 
+@push('css')
+<style>
+.captcha-label { display:block; font-weight:600; font-size:13px; color:#374151; margin-bottom:6px; }
+.captcha-box { display:flex; align-items:stretch; gap:10px; background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:10px; flex-wrap:wrap; }
+.captcha-image-wrap { flex:0 0 auto; background:#fff; border-radius:8px; overflow:hidden; border:1px solid #e5e7eb; display:flex; align-items:center; padding:4px 10px; min-height:52px; }
+.captcha-image-wrap img { display:block; height:44px; max-width:100%; }
+.captcha-refresh { flex:0 0 auto; width:42px; height:42px; align-self:center; border:0; border-radius:50%; background:#2563eb; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:transform 0.4s ease; }
+.captcha-refresh:hover { background:#1d4ed8; transform:rotate(180deg); }
+.captcha-input { flex:1; min-width:0; border:1px solid #e5e7eb; border-radius:8px; background:#fff; padding:10px 14px; font-size:14px; letter-spacing:1px; color:#111827; }
+.captcha-input:focus { outline:none; border-color:#2563eb; box-shadow:0 0 0 3px rgba(37,99,235,0.12); }
+</style>
+@endpush
+
 @push('js')
 <script src="{{ asset('frontend-assets/js/ownerJs/register.js') }}"></script>
+<script>
+document.getElementById('refreshCaptcha').addEventListener('click', function () {
+    document.getElementById('captcha-image').src = '{{ url("captcha/flat") }}?' + Date.now();
+});
+</script>
 @endpush
