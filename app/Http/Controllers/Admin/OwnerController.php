@@ -30,12 +30,6 @@ class OwnerController extends Controller
                     }
                     return '<span class="badge bg-warning text-dark">Pending</span>';
                 })
-                ->editColumn('status', function ($row) {
-                    if ($row->status == 1) {
-                        return '<span class="badge bg-danger">Blocked</span>';
-                    }
-                    return '<span class="badge bg-success">Active</span>';
-                })
                 ->addColumn('total_properties', function ($row) {
                     return '<span class="badge bg-info">' . $row->properties()->count() . '</span>';
                 })
@@ -43,9 +37,6 @@ class OwnerController extends Controller
                     $approveLabel = $row->is_approved == 1 ? 'Revoke Approval' : 'Approve';
                     $approveIcon  = $row->is_approved == 1 ? 'bx-x-circle' : 'bx-check-circle';
                     $approveColor = $row->is_approved == 1 ? 'text-danger' : 'text-success';
-
-                    $blockLabel = $row->status == 1 ? 'Unblock' : 'Block';
-                    $blockIcon  = $row->status == 1 ? 'bx-lock-open' : 'bx-block';
 
                     return '
                         <div class="dropdown">
@@ -60,17 +51,16 @@ class OwnerController extends Controller
                                    data-name="' . e($row->name) . '">
                                     <i class="bx ' . $approveIcon . ' me-1"></i>' . $approveLabel . '
                                 </a>
-                                <a class="dropdown-item toggle-block-owner"
+                                <a class="dropdown-item text-danger delete-owner"
                                    href="javascript:void(0);"
                                    data-id="' . $row->id . '"
-                                   data-status="' . $row->status . '"
                                    data-name="' . e($row->name) . '">
-                                    <i class="bx ' . $blockIcon . ' me-1"></i>' . $blockLabel . '
+                                    <i class="bx bx-trash me-1"></i>Delete
                                 </a>
                             </div>
                         </div>';
                 })
-                ->rawColumns(['is_approved', 'status', 'total_properties', 'action'])
+                ->rawColumns(['is_approved', 'total_properties', 'action'])
                 ->make(true);
         }
 
@@ -94,7 +84,7 @@ class OwnerController extends Controller
         return response()->json(['status' => 200, 'msg' => $msg]);
     }
 
-    public function toggleBlock(Request $request)
+    public function destroy(Request $request)
     {
         if (!Auth::user()->can('owner-list')) {
             throw UnauthorizedException::forPermissions(['owner-list']);
@@ -103,11 +93,12 @@ class OwnerController extends Controller
         $user = User::whereHas('roles', fn($q) => $q->where('name', 'owner'))
             ->findOrFail($request->input('id'));
 
-        $newStatus = $user->status == 1 ? 0 : 1;
-        $user->update(['status' => $newStatus]);
+        if ($user->properties()->count() > 0) {
+            return response()->json(['status' => 422, 'msg' => "Can't delete this account. Owner has active properties."]);
+        }
 
-        $msg = $newStatus == 1 ? 'Owner blocked successfully.' : 'Owner unblocked successfully.';
+        $user->forceDelete();
 
-        return response()->json(['status' => 200, 'msg' => $msg]);
+        return response()->json(['status' => 200, 'msg' => 'Owner deleted successfully.']);
     }
 }

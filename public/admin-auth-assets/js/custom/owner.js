@@ -21,7 +21,6 @@ $(function () {
             { data: "email",            name: "email",            orderable: false,  searchable: true  },
             { data: "total_properties", name: "total_properties", orderable: false,  searchable: false },
             { data: "is_approved",      name: "is_approved",      orderable: false,  searchable: false },
-            { data: "status",           name: "status",           orderable: false,  searchable: false },
             { data: "action",           name: "action",           orderable: false,  searchable: false },
         ],
     });
@@ -37,8 +36,8 @@ $(function () {
         let text    = isApproving
             ? name + " will be able to log in and manage their listings."
             : name + " will no longer be able to log in until re-approved.";
-        let btnText = isApproving ? "Yes, Approve" : "Yes, Revoke";
-        let icon    = isApproving ? "question" : "warning";
+        let btnText  = isApproving ? "Yes, Approve" : "Yes, Revoke";
+        let icon     = isApproving ? "question" : "warning";
         let btnColor = isApproving ? "#28a745" : "#e74c3c";
 
         Swal.fire({
@@ -59,13 +58,7 @@ $(function () {
                 data: { id: id, _token: $('meta[name="csrf-token"]').attr("content") },
                 success: function (res) {
                     if (res.status === 200) {
-                        Swal.fire({
-                            title: "Done!",
-                            text: res.msg,
-                            icon: "success",
-                            timer: 1800,
-                            showConfirmButton: false,
-                        });
+                        Swal.fire({ title: "Done!", text: res.msg, icon: "success", timer: 1800, showConfirmButton: false });
                         table.ajax.reload(null, false);
                     }
                 },
@@ -76,47 +69,33 @@ $(function () {
         });
     });
 
-    // ── Block / Unblock ───────────────────────────────────────────────────────
-    $(document).on("click", ".toggle-block-owner", function () {
-        let id     = $(this).data("id");
-        let status = parseInt($(this).data("status"));
-        let name   = $(this).data("name");
-
-        let isBlocking = status !== 1;
-        let title   = isBlocking ? "Block Owner?" : "Unblock Owner?";
-        let text    = isBlocking
-            ? name + " will be blocked and cannot log in."
-            : name + " will be unblocked and can log in again.";
-        let btnText  = isBlocking ? "Yes, Block" : "Yes, Unblock";
-        let icon     = isBlocking ? "warning" : "question";
-        let btnColor = isBlocking ? "#e74c3c" : "#28a745";
+    // ── Delete Owner ───────────────────────────────────────────────────────────
+    $(document).on("click", ".delete-owner", function () {
+        let id   = $(this).data("id");
+        let name = $(this).data("name");
 
         Swal.fire({
-            title: title,
-            text: text,
-            icon: icon,
+            title: "Delete Owner?",
+            text: "This will permanently delete " + name + ". This action cannot be undone.",
+            icon: "warning",
             showCancelButton: true,
-            confirmButtonColor: btnColor,
+            confirmButtonColor: "#e74c3c",
             cancelButtonColor: "#6c757d",
-            confirmButtonText: btnText,
+            confirmButtonText: "Yes, Delete",
             cancelButtonText: "Cancel",
         }).then(function (result) {
             if (!result.isConfirmed) return;
 
             $.ajax({
-                url: site_url + "/admin/owner/toggle-block",
+                url: site_url + "/admin/owner/delete",
                 method: "POST",
                 data: { id: id, _token: $('meta[name="csrf-token"]').attr("content") },
                 success: function (res) {
                     if (res.status === 200) {
-                        Swal.fire({
-                            title: "Done!",
-                            text: res.msg,
-                            icon: "success",
-                            timer: 1800,
-                            showConfirmButton: false,
-                        });
+                        Swal.fire({ title: "Deleted!", text: res.msg, icon: "success", timer: 1800, showConfirmButton: false });
                         table.ajax.reload(null, false);
+                    } else {
+                        Swal.fire("Cannot Delete", res.msg, "error");
                     }
                 },
                 error: function () {

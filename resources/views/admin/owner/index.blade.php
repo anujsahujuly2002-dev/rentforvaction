@@ -20,7 +20,6 @@ Manage Owners
                             <th>Email</th>
                             <th>Total Properties</th>
                             <th>Approval</th>
-                            <th>Status</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
