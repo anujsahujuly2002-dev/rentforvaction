@@ -374,18 +374,19 @@
     </section>
 @endsection
 
-@push('css')
+@section('css1')
 <style>
 .captcha-label { display:block; font-weight:600; font-size:13px; color:#374151; margin-bottom:6px; }
 .captcha-box { display:flex; align-items:stretch; gap:10px; background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; padding:10px; flex-wrap:wrap; }
-.captcha-image-wrap { flex:0 0 auto; background:#fff; border-radius:8px; overflow:hidden; border:1px solid #e5e7eb; display:flex; align-items:center; padding:4px 10px; min-height:52px; }
-.captcha-image-wrap img { display:block; height:44px; max-width:100%; }
-.captcha-refresh { flex:0 0 auto; width:42px; height:42px; align-self:center; border:0; border-radius:50%; background:#2563eb; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:transform 0.4s ease; }
+.captcha-image-wrap { flex:0 0 auto; background:#fff; border-radius:8px; overflow:hidden; border:1px solid #e5e7eb; display:flex; align-items:center; justify-content:center; padding:4px 10px; min-height:52px; }
+.captcha-image-wrap img#captcha-image { display:block; height:44px; max-width:100%; cursor:pointer; }
+.captcha-refresh { flex:0 0 auto; width:42px; height:42px; align-self:center; border:0; border-radius:50%; background:#2563eb; color:#fff; font-size:15px; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 2px 6px rgba(37,99,235,0.3); transition:transform 0.4s ease, background 0.15s ease; }
 .captcha-refresh:hover { background:#1d4ed8; transform:rotate(180deg); }
-.captcha-input { flex:1; min-width:0; border:1px solid #e5e7eb; border-radius:8px; background:#fff; padding:10px 14px; font-size:14px; letter-spacing:1px; color:#111827; }
+.captcha-input { flex:1; min-width:0; border:1px solid #e5e7eb; border-radius:8px; background:#fff; padding:10px 14px; font-size:14px; font-weight:500; letter-spacing:1px; color:#111827; transition:border-color 0.15s ease, box-shadow 0.15s ease; }
 .captcha-input:focus { outline:none; border-color:#2563eb; box-shadow:0 0 0 3px rgba(37,99,235,0.12); }
+.captcha-input::placeholder { font-weight:400; letter-spacing:0.3px; color:#9ca3af; }
 </style>
-@endpush
+@endsection
 
 @push('js')
 <script src="{{ asset('frontend-assets/js/ownerJs/register.js') }}"></script>

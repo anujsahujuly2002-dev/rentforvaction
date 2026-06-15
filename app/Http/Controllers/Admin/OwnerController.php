@@ -40,20 +40,35 @@ class OwnerController extends Controller
                     return '<span class="badge bg-info">' . $row->properties()->count() . '</span>';
                 })
                 ->addColumn('action', function ($row) {
-                    $approveBtn = '';
-                    if ($row->is_approved != 1) {
-                        $approveBtn = '<a class="dropdown-item approve-owner" href="javascript:void(0);" data-id="' . $row->id . '"><i class="bx bx-check me-1"></i>Approve</a>';
-                    }
+                    $approveLabel = $row->is_approved == 1 ? 'Revoke Approval' : 'Approve';
+                    $approveIcon  = $row->is_approved == 1 ? 'bx-x-circle' : 'bx-check-circle';
+                    $approveColor = $row->is_approved == 1 ? 'text-danger' : 'text-success';
+
                     $blockLabel = $row->status == 1 ? 'Unblock' : 'Block';
                     $blockIcon  = $row->status == 1 ? 'bx-lock-open' : 'bx-block';
-                    $blockBtn   = '<a class="dropdown-item toggle-block-owner" href="javascript:void(0);" data-id="' . $row->id . '" data-status="' . $row->status . '"><i class="bx ' . $blockIcon . ' me-1"></i>' . $blockLabel . '</a>';
 
-                    return '<div class="dropdown">
-                        <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                          <i class="bx bx-dots-vertical-rounded"></i>
-                        </button>
-                        <div class="dropdown-menu">' . $approveBtn . $blockBtn . '</div>
-                      </div>';
+                    return '
+                        <div class="dropdown">
+                            <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                                <i class="bx bx-dots-vertical-rounded"></i>
+                            </button>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item toggle-approve-owner ' . $approveColor . '"
+                                   href="javascript:void(0);"
+                                   data-id="' . $row->id . '"
+                                   data-approved="' . $row->is_approved . '"
+                                   data-name="' . e($row->name) . '">
+                                    <i class="bx ' . $approveIcon . ' me-1"></i>' . $approveLabel . '
+                                </a>
+                                <a class="dropdown-item toggle-block-owner"
+                                   href="javascript:void(0);"
+                                   data-id="' . $row->id . '"
+                                   data-status="' . $row->status . '"
+                                   data-name="' . e($row->name) . '">
+                                    <i class="bx ' . $blockIcon . ' me-1"></i>' . $blockLabel . '
+                                </a>
+                            </div>
+                        </div>';
                 })
                 ->rawColumns(['is_approved', 'status', 'total_properties', 'action'])
                 ->make(true);
@@ -62,7 +77,7 @@ class OwnerController extends Controller
         return view('admin.owner.index');
     }
 
-    public function approve(Request $request)
+    public function toggleApprove(Request $request)
     {
         if (!Auth::user()->can('owner-list')) {
             throw UnauthorizedException::forPermissions(['owner-list']);
@@ -71,9 +86,12 @@ class OwnerController extends Controller
         $user = User::whereHas('roles', fn($q) => $q->where('name', 'owner'))
             ->findOrFail($request->input('id'));
 
-        $user->update(['is_approved' => 1]);
+        $newValue = $user->is_approved == 1 ? 0 : 1;
+        $user->update(['is_approved' => $newValue]);
 
-        return response()->json(['status' => 200, 'msg' => 'Owner approved successfully.']);
+        $msg = $newValue == 1 ? 'Owner approved successfully.' : 'Owner approval revoked.';
+
+        return response()->json(['status' => 200, 'msg' => $msg]);
     }
 
     public function toggleBlock(Request $request)
@@ -88,7 +106,7 @@ class OwnerController extends Controller
         $newStatus = $user->status == 1 ? 0 : 1;
         $user->update(['status' => $newStatus]);
 
-        $msg = $newStatus == 1 ? 'Owner blocked.' : 'Owner unblocked.';
+        $msg = $newStatus == 1 ? 'Owner blocked successfully.' : 'Owner unblocked successfully.';
 
         return response()->json(['status' => 200, 'msg' => $msg]);
     }

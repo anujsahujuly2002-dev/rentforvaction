@@ -145,7 +145,7 @@ Route::prefix('admin')->name('admin.')->group(function() {
 
         Route::controller(OwnerController::class)->prefix('owner')->name('owner.')->group(function() {
             Route::get('/','index')->name('index');
-            Route::post('/approve','approve')->name('approve');
+            Route::post('/toggle-approve','toggleApprove')->name('toggle-approve');
             Route::post('/toggle-block','toggleBlock')->name('toggle-block');
         });
 
